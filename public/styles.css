@@ -351,6 +351,12 @@ body.light-theme .stat-icon {
   fill: var(--accent);
 }
 
+.stat-img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
 .stat-info {
   display: flex;
   flex-direction: column;
@@ -1535,6 +1541,10 @@ body.light-theme .toast {
   .stat-icon svg.stat-svg {
     width: 18px;
     height: 18px;
+  }
+  .stat-img {
+    width: 24px;
+    height: 24px;
   }
   .stat-label {
     font-size: 0.6rem;
