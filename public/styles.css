@@ -1435,3 +1435,211 @@ body.light-theme .toast {
   to { transform: translateY(0); opacity: 1; }
 }
 
+/* ==========================================================================
+   Mobile Optimization Overrides
+   ========================================================================== */
+@media (max-width: 600px) {
+  /* Header layout updates */
+  .header-container {
+    padding: 1rem;
+  }
+  .logo-title {
+    font-size: 1.4rem;
+  }
+  .logo-icon {
+    font-size: 1.4rem;
+  }
+  .btn {
+    padding: 0.5rem 0.85rem;
+    font-size: 0.8rem;
+  }
+  #add-btn-header span {
+    display: none; /* Hide button text, only show icon on very small headers */
+  }
+  #add-btn-header::after {
+    content: "Registrar"; /* Short word instead */
+    display: inline;
+  }
+  
+  /* App container adjustments */
+  .app-container {
+    padding: 1rem 0.75rem;
+    gap: 1.25rem;
+  }
+
+  /* Stats Grid Compact Design */
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+  }
+  .stat-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0.65rem 0.35rem;
+    gap: 0.2rem;
+  }
+  .stat-card::before {
+    width: 100%;
+    height: 3px;
+  }
+  .stat-icon {
+    font-size: 1.2rem;
+    width: 32px;
+    height: 32px;
+  }
+  .stat-label {
+    font-size: 0.6rem;
+    letter-spacing: 0px;
+  }
+  .stat-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  /* Toolbar side-by-side elements */
+  .toolbar-section {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+  .search-wrapper input {
+    font-size: 0.85rem;
+    padding: 0.65rem 1rem 0.65rem 2.25rem;
+  }
+  .search-icon {
+    width: 14px;
+    height: 14px;
+  }
+  .filters-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .filter-group select {
+    font-size: 0.85rem;
+    padding: 0.65rem 1.75rem 0.65rem 0.75rem;
+    background-position: right 0.6rem center;
+  }
+
+  /* Grid details */
+  .restaurants-grid {
+    grid-template-columns: 1fr; /* single column card for best legibility on phone */
+    gap: 1.25rem;
+  }
+  .restaurant-card {
+    border-radius: var(--radius-sm);
+  }
+  .card-img-wrapper {
+    height: 170px;
+  }
+  .card-body {
+    padding: 1rem;
+  }
+  .card-title {
+    font-size: 1.25rem;
+  }
+  .card-description {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    -webkit-line-clamp: 2; /* show less description text on grid to save height */
+  }
+
+  /* Modals Fullscreen Experience */
+  .modal-overlay {
+    padding: 0;
+  }
+  .modal-card {
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-header {
+    padding: 1rem;
+  }
+  .modal-header h2 {
+    font-size: 1.3rem;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    gap: 1.25rem;
+    overflow-y: auto; /* Allow form fields to scroll on small devices */
+  }
+  .modal-footer {
+    padding: 1rem;
+  }
+
+  /* Image upload sizes in forms */
+  .image-dropzone {
+    min-height: 180px;
+    padding: 1rem;
+  }
+  .dropzone-prompt svg {
+    width: 24px;
+    height: 24px;
+  }
+  .dropzone-prompt span {
+    font-size: 0.85rem;
+  }
+  .additional-previews-container {
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    min-height: 50px;
+  }
+
+  /* Details Screen tweaks */
+  .detail-hero {
+    height: 220px;
+  }
+  .detail-body {
+    padding: 1rem;
+    gap: 1.25rem;
+  }
+  .detail-meta h2 {
+    font-size: 1.6rem;
+  }
+  .detail-desc {
+    font-size: 0.95rem;
+  }
+  .review-item {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+  .review-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+  .review-author {
+    font-size: 0.85rem;
+  }
+  .review-text {
+    font-size: 0.85rem;
+  }
+  .new-review-box {
+    padding: 1rem;
+  }
+  .new-review-box h4 {
+    font-size: 1rem;
+  }
+  .rating-slider-wrapper {
+    padding: 0.35rem 0.75rem;
+    gap: 0.5rem;
+  }
+  
+  /* Toast adjustment */
+  .toast-container {
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
+  }
+  .toast {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    width: 100%;
+  }
+}
+
