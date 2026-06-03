@@ -902,12 +902,8 @@ select:focus {
 }
 
 .stars-outer::before {
-  content: "★★★★★";
+  content: "\2605\FE0E\2605\FE0E\2605\FE0E\2605\FE0E\2605\FE0E";
   letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.15);
-}
-
-body.light-theme .stars-outer::before {
   color: rgba(15, 23, 42, 0.12);
 }
 
@@ -924,7 +920,7 @@ body.light-theme .stars-outer::before {
 }
 
 .stars-inner::before {
-  content: "★★★★★";
+  content: "\2605\FE0E\2605\FE0E\2605\FE0E\2605\FE0E\2605\FE0E";
   letter-spacing: 2px;
 }
 
@@ -1289,22 +1285,67 @@ body.light-theme .review-item {
   white-space: pre-line;
 }
 
-/* Form block for adding new reviews directly inside Details */
-.new-review-box {
-  padding: 1.25rem;
+/* Form block for adding new reviews directly inside Details & Initial Review section */
+.new-review-box,
+.initial-review-section {
+  padding: 1.5rem;
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.01);
-  border: 1px dashed var(--border-glass);
+  background: #0f172a; /* Sleek Premium Dark Blue */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.3);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
+  color: #f8fafc;
 }
 
-.new-review-box h4 {
+.new-review-box h4,
+.initial-review-section h3.section-subtitle {
   font-family: var(--font-serif);
-  font-size: 1.15rem;
+  font-size: 1.20rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #ffffff !important;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.5rem;
+}
+
+.new-review-box .form-label,
+.initial-review-section .form-label {
+  color: #cbd5e1 !important;
+}
+
+.new-review-box input[type="text"],
+.new-review-box input[type="date"],
+.new-review-box textarea,
+.initial-review-section input[type="text"],
+.initial-review-section input[type="date"],
+.initial-review-section textarea {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+.new-review-box input[type="text"]::placeholder,
+.new-review-box textarea::placeholder,
+.initial-review-section input[type="text"]::placeholder,
+.initial-review-section textarea::placeholder {
+  color: #64748b !important;
+}
+
+.new-review-box input[type="text"]:focus,
+.new-review-box input[type="date"]:focus,
+.new-review-box textarea:focus,
+.initial-review-section input[type="text"]:focus,
+.initial-review-section input[type="date"]:focus,
+.initial-review-section textarea:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.3) !important;
+}
+
+.new-review-box .stars-outer::before,
+.initial-review-section .stars-outer::before {
+  color: rgba(255, 255, 255, 0.15) !important;
 }
 
 .btn-sm {
