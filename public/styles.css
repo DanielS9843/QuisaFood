@@ -2,24 +2,23 @@
    GastroLog - Core Style System (Vanilla CSS)
    ========================================================================== */
 
-/* Theme Variables */
 :root {
-  /* Color Tokens - Dark Mode (Default) */
-  --bg-primary: #0a0b10;
-  --bg-secondary: #131520;
-  --bg-glass: rgba(20, 22, 34, 0.6);
-  --border-glass: rgba(255, 255, 255, 0.08);
-  --border-focus: rgba(251, 191, 36, 0.4);
-  --bg-header: rgba(10, 11, 16, 0.75);
+  /* Color Tokens - Light Theme (Default & Only) */
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.65);
+  --border-glass: rgba(15, 23, 42, 0.08);
+  --border-focus: rgba(245, 158, 11, 0.4);
+  --bg-header: rgba(248, 250, 252, 0.75);
   
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
   
-  --accent: #fbbf24; /* Amber Gold for stars & primary elements */
-  --accent-rgb: 251, 191, 36;
-  --accent-gradient: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  --btn-shadow: 0 4px 20px rgba(251, 191, 36, 0.15);
+  --accent: #d97706; /* Rich Amber */
+  --accent-rgb: 217, 119, 6;
+  --accent-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  --btn-shadow: 0 4px 20px rgba(217, 119, 6, 0.1);
   
   --danger: #ef4444;
   --danger-rgb: 239, 68, 68;
@@ -37,30 +36,9 @@
   --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   
-  --shadow-lg: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 20px 40px -15px rgba(15, 23, 42, 0.1);
   --font-sans: 'Outfit', sans-serif;
   --font-serif: 'Playfair Display', serif;
-}
-
-/* Light Theme Variables */
-body.light-theme {
-  --bg-primary: #f8fafc;
-  --bg-secondary: #ffffff;
-  --bg-glass: rgba(255, 255, 255, 0.65);
-  --border-glass: rgba(15, 23, 42, 0.08);
-  --border-focus: rgba(245, 158, 11, 0.4);
-  --bg-header: rgba(248, 250, 252, 0.75);
-  
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-  
-  --accent: #d97706; /* Rich Amber */
-  --accent-rgb: 217, 119, 6;
-  --accent-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  --btn-shadow: 0 4px 20px rgba(217, 119, 6, 0.1);
-  
-  --shadow-lg: 0 20px 40px -15px rgba(15, 23, 42, 0.1);
 }
 
 /* Reset & Base Styles */
@@ -162,9 +140,9 @@ body.light-theme .bg-glow {
 .header-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1.25rem 2rem;
+  padding: 1rem 2rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 }
 
@@ -184,20 +162,10 @@ body.light-theme .bg-glow {
 }
 
 .logo-img {
-  height: 52px;
+  height: 72px;
   width: auto;
   object-fit: contain;
-  background: #ffffff;
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--radius-sm);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   display: block;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
 }
 
 /* ==========================================================================
@@ -283,11 +251,40 @@ body.light-theme .btn-icon:hover {
   background: rgba(15, 23, 42, 0.03);
 }
 
-/* Light/Dark Toggle Icon States */
-body.dark-theme .sun-icon { display: block; }
-body.dark-theme .moon-icon { display: none; }
-body.light-theme .sun-icon { display: none; }
-body.light-theme .moon-icon { display: block; }
+/* Floating Action Button (FAB) */
+.btn-fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: var(--accent-gradient);
+  color: #ffffff !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(217, 119, 6, 0.35);
+  border: none;
+  cursor: pointer;
+  z-index: 999;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.btn-fab:hover {
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 8px 24px rgba(217, 119, 6, 0.5);
+}
+
+.btn-fab:active {
+  transform: translateY(0) scale(1);
+}
+
+.btn-fab svg {
+  width: 28px;
+  height: 28px;
+  stroke: #ffffff;
+}
 
 /* ==========================================================================
    Main Application Container

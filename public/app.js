@@ -21,8 +21,7 @@ let state = {
 // DOM Element Map
 const DOM = {
   body: document.body,
-  themeToggle: document.getElementById('theme-toggle'),
-  addBtnHeader: document.getElementById('add-btn-header'),
+  addBtnFab: document.getElementById('add-btn-fab'),
   addBtnEmpty: document.getElementById('add-btn-empty'),
   
   // Stats
@@ -103,17 +102,10 @@ const DOM = {
 // Initialization & API Communication
 // ==========================================================================
 async function init() {
-  // 1. Load Theme
-  const savedTheme = localStorage.getItem('gastroLog_theme');
-  if (savedTheme) {
-    state.theme = savedTheme;
-    applyTheme();
-  }
-
-  // 2. Fetch Restaurants Database from Express Backend
+  // Fetch Restaurants Database from Express Backend
   await fetchRestaurants();
 
-  // 3. Setup Event Listeners
+  // Setup Event Listeners
   setupEventListeners();
 }
 
@@ -180,25 +172,7 @@ function populateFormCategoryDropdown() {
   DOM.inputCategory.appendChild(customOpt);
 }
 
-// ==========================================================================
-// Theme Toggling
-// ==========================================================================
-function applyTheme() {
-  if (state.theme === 'light') {
-    DOM.body.classList.remove('dark-theme');
-    DOM.body.classList.add('light-theme');
-  } else {
-    DOM.body.classList.remove('light-theme');
-    DOM.body.classList.add('dark-theme');
-  }
-}
 
-function toggleTheme() {
-  state.theme = state.theme === 'dark' ? 'light' : 'dark';
-  localStorage.setItem('gastroLog_theme', state.theme);
-  applyTheme();
-  showToast(`Modo ${state.theme === 'dark' ? 'oscuro' : 'claro'} activado`, 'info');
-}
 
 // ==========================================================================
 // Review Math Helpers
@@ -1048,13 +1022,13 @@ function renderGrid() {
 // Event Listeners Binding
 // ==========================================================================
 function setupEventListeners() {
-  DOM.themeToggle.addEventListener('click', toggleTheme);
-
   DOM.searchInput.addEventListener('input', handleSearch);
   DOM.filterCategory.addEventListener('change', handleCategoryFilter);
   DOM.sortSelect.addEventListener('change', handleSorting);
 
-  DOM.addBtnHeader.addEventListener('click', openAddModal);
+  if (DOM.addBtnFab) {
+    DOM.addBtnFab.addEventListener('click', openAddModal);
+  }
   DOM.addBtnEmpty.addEventListener('click', openAddModal);
   
   DOM.closeModalBtn.addEventListener('click', closeModal);
