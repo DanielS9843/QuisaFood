@@ -50,6 +50,9 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  width: 100%;
+  background-color: var(--bg-primary);
 }
 
 body {
@@ -59,7 +62,8 @@ body {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  transition: background-color var(--transition-normal), color var(--transition-normal);
+  width: 100%;
+  max-width: 100%;
   line-height: 1.6;
 }
 
@@ -151,18 +155,8 @@ body.light-theme .bg-glow {
   align-items: center;
 }
 
-.logo-link {
-  display: block;
-  text-decoration: none;
-  transition: transform var(--transition-fast);
-}
-
-.logo-link:hover {
-  transform: scale(1.04);
-}
-
 .logo-img {
-  height: 72px;
+  height: 96px;
   width: auto;
   object-fit: contain;
   display: block;
@@ -1439,25 +1433,31 @@ body.light-theme .toast {
    Mobile Optimization Overrides
    ========================================================================== */
 @media (max-width: 600px) {
+  /* Scale down ambient glows to prevent absolute-position viewport leakages */
+  .bg-glow {
+    width: 250px;
+    height: 250px;
+    filter: blur(80px);
+  }
+  .bg-glow-1 {
+    top: -50px;
+    right: -50px;
+  }
+  .bg-glow-2 {
+    bottom: -75px;
+    left: -75px;
+  }
+
   /* Header layout updates */
   .header-container {
-    padding: 1rem;
+    padding: 0.75rem;
   }
   .logo-img {
-    height: 42px;
-    padding: 0.15rem 0.5rem;
-    border-radius: 6px;
+    height: 60px;
   }
   .btn {
     padding: 0.5rem 0.85rem;
     font-size: 0.8rem;
-  }
-  #add-btn-header span {
-    display: none; /* Hide button text, only show icon on very small headers */
-  }
-  #add-btn-header::after {
-    content: "Registrar"; /* Short word instead */
-    display: inline;
   }
   
   /* App container adjustments */
@@ -1468,15 +1468,15 @@ body.light-theme .toast {
 
   /* Stats Grid Compact Design */
   .stats-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.4rem;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.6rem;
   }
   .stat-card {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 0.65rem 0.35rem;
-    gap: 0.2rem;
+    padding: 0.75rem 0.5rem;
+    gap: 0.3rem;
   }
   .stat-card::before {
     width: 100%;
@@ -1549,8 +1549,9 @@ body.light-theme .toast {
     padding: 0;
   }
   .modal-card {
-    height: 100vh;
-    max-height: 100vh;
+    height: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
     border-radius: 0;
     border: none;
     display: flex;
