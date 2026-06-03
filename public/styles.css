@@ -65,6 +65,8 @@ body {
   width: 100%;
   max-width: 100%;
   line-height: 1.6;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Background Ambient Glows */
@@ -285,12 +287,13 @@ body.light-theme .btn-icon:hover {
    ========================================================================== */
 .app-container {
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
   padding: 2.5rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
-  min-height: calc(100vh - 160px);
+  flex-grow: 1;
 }
 
 /* ==========================================================================
@@ -323,7 +326,6 @@ body.light-theme .btn-icon:hover {
 }
 
 .stat-icon {
-  font-size: 2rem;
   background: rgba(251, 191, 36, 0.1);
   width: 56px;
   height: 56px;
@@ -335,6 +337,18 @@ body.light-theme .btn-icon:hover {
 
 body.light-theme .stat-icon {
   background: rgba(217, 119, 6, 0.08);
+}
+
+.stat-icon svg.stat-svg {
+  width: 28px;
+  height: 28px;
+  stroke: var(--accent);
+  stroke-width: 2px;
+  fill: none;
+}
+
+.stat-icon svg.stat-star-svg {
+  fill: var(--accent);
 }
 
 .stat-info {
@@ -1515,9 +1529,12 @@ body.light-theme .toast {
     height: 3px;
   }
   .stat-icon {
-    font-size: 1.2rem;
     width: 32px;
     height: 32px;
+  }
+  .stat-icon svg.stat-svg {
+    width: 18px;
+    height: 18px;
   }
   .stat-label {
     font-size: 0.6rem;
