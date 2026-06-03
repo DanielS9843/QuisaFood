@@ -277,6 +277,41 @@ app.post('/api/restaurants/:id/reviews', async (req, res) => {
   }
 });
 
+// 4.5. PUT edit a specific review
+app.put('/api/restaurants/:id/reviews/:reviewId', async (req, res) => {
+  try {
+    const { id, reviewId } = req.params;
+    const { author, rating, description, date } = req.body;
+
+    const review = await Review.findOne({
+      where: {
+        id: reviewId,
+        restaurantId: id
+      }
+    });
+
+    if (!review) {
+      return res.status(404).json({ error: 'Reseña no encontrada.' });
+    }
+
+    if (!author || isNaN(rating) || !description || !date) {
+      return res.status(400).json({ error: 'Faltan campos requeridos.' });
+    }
+
+    await review.update({
+      author,
+      rating: parseFloat(rating),
+      description,
+      date
+    });
+
+    res.json(review);
+  } catch (error) {
+    console.error('Error updating review:', error);
+    res.status(500).json({ error: 'Error al actualizar la reseña.' });
+  }
+});
+
 // 5. DELETE a specific review from a restaurant
 app.delete('/api/restaurants/:id/reviews/:reviewId', async (req, res) => {
   try {

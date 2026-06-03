@@ -15,7 +15,8 @@ let state = {
   uploadedImageBase64: '',
   uploadedAdditionalImages: [], // Array of base64 strings
   editingId: null,
-  activeDetailId: null
+  activeDetailId: null,
+  editingReviewId: null
 };
 
 // DOM Element Map
@@ -93,6 +94,9 @@ const DOM = {
   newReviewRatingVal: document.getElementById('new-review-rating-val'),
   newReviewStarsPreview: document.getElementById('new-review-stars-preview'),
   reviewDesc: document.getElementById('review-desc'),
+  reviewFormTitle: document.getElementById('new-review-form-title'),
+  submitReviewBtn: document.getElementById('submit-review-btn'),
+  cancelEditReviewBtn: document.getElementById('cancel-edit-review-btn'),
 
   // Toasts
   toastContainer: document.getElementById('toast-container')
@@ -691,12 +695,25 @@ function renderReviewsTimeline(rest) {
         </div>
         <p class="review-text">${rev.description}</p>
       </div>
-      ${rest.reviews.length > 1 ? `
-        <button class="btn-card-action delete-action delete-review-btn" data-review-id="${rev.id}" title="Eliminar reseña" aria-label="Eliminar reseña" style="margin-left: 0.5rem; align-self: flex-start;">
-          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      <div class="review-actions-wrapper" style="display: flex; gap: 0.25rem; align-self: flex-start; margin-left: 0.5rem;">
+        <button class="btn-card-action edit-review-btn" data-review-id="${rev.id}" title="Editar reseña" aria-label="Editar reseña">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
         </button>
-      ` : ''}
+        ${rest.reviews.length > 1 ? `
+          <button class="btn-card-action delete-action delete-review-btn" data-review-id="${rev.id}" title="Eliminar reseña" aria-label="Eliminar reseña">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        ` : ''}
+      </div>
     `;
+
+    const editBtn = item.querySelector('.edit-review-btn');
+    if (editBtn) {
+      editBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        startEditReview(rev);
+      });
+    }
 
     const delBtn = item.querySelector('.delete-review-btn');
     if (delBtn) {
@@ -710,6 +727,31 @@ function renderReviewsTimeline(rest) {
 
     DOM.detailReviewsList.appendChild(item);
   });
+}
+
+function startEditReview(rev) {
+  state.editingReviewId = rev.id;
+  DOM.reviewAuthor.value = rev.author;
+  DOM.reviewDate.value = rev.date;
+  DOM.reviewDesc.value = rev.description;
+  DOM.reviewRating.value = rev.rating;
+  syncReviewSlider(rev.rating);
+  
+  DOM.reviewFormTitle.textContent = 'Editar Reseña';
+  DOM.submitReviewBtn.textContent = 'Guardar Cambios';
+  DOM.cancelEditReviewBtn.classList.remove('hide');
+  
+  // Smooth scroll to the form inside the modal
+  DOM.newReviewForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function cancelEditReview() {
+  state.editingReviewId = null;
+  DOM.newReviewForm.reset();
+  syncReviewSlider(4.0);
+  DOM.reviewFormTitle.textContent = 'Escribir una reseña';
+  DOM.submitReviewBtn.textContent = 'Publicar Reseña';
+  DOM.cancelEditReviewBtn.classList.add('hide');
 }
 
 async function handleAddReviewSubmit(e) {
@@ -728,8 +770,8 @@ async function handleAddReviewSubmit(e) {
     return;
   }
 
-  const newReview = {
-    id: 'rev-' + Date.now(),
+  const reviewData = {
+    id: state.editingReviewId || ('rev-' + Date.now()),
     author: sanitizeHTML(author),
     rating: rating,
     description: sanitizeHTML(desc),
@@ -737,20 +779,30 @@ async function handleAddReviewSubmit(e) {
   };
 
   try {
-    const response = await fetch(`/api/restaurants/${state.activeDetailId}/reviews`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newReview)
-    });
+    let response;
+    if (state.editingReviewId) {
+      response = await fetch(`/api/restaurants/${state.activeDetailId}/reviews/${state.editingReviewId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reviewData)
+      });
+    } else {
+      response = await fetch(`/api/restaurants/${state.activeDetailId}/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reviewData)
+      });
+    }
 
     if (!response.ok) throw new Error('API server error');
 
-    showToast('¡Reseña agregada con éxito!', 'success');
+    showToast(state.editingReviewId ? '¡Reseña actualizada con éxito!' : '¡Reseña agregada con éxito!', 'success');
+    cancelEditReview();
     await fetchRestaurants();
     openDetailModal(rest.id); // Reload detail view
   } catch (error) {
-    console.error('Error adding review:', error);
-    showToast('Error al publicar la reseña', 'danger');
+    console.error('Error submitting review:', error);
+    showToast('Error al guardar la reseña', 'danger');
   }
 }
 
@@ -776,6 +828,7 @@ function closeDetailModal() {
   DOM.detailModal.setAttribute('aria-hidden', 'true');
   DOM.body.style.overflow = '';
   state.activeDetailId = null;
+  cancelEditReview();
 }
 
 function handleDetailEdit() {
@@ -1046,6 +1099,7 @@ function setupEventListeners() {
 
   // Submit handler for adding a review in Detail modal
   DOM.newReviewForm.addEventListener('submit', handleAddReviewSubmit);
+  DOM.cancelEditReviewBtn.addEventListener('click', cancelEditReview);
 
   // Click outside modal
   window.addEventListener('click', (e) => {

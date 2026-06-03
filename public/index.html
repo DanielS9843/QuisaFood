@@ -259,7 +259,7 @@
 
         <!-- Add Review inline form -->
         <div class="new-review-box card-glass">
-          <h4>Escribir una reseña</h4>
+          <h4 id="new-review-form-title">Escribir una reseña</h4>
           <form id="new-review-form">
             <div class="form-row">
               <div class="form-group">
@@ -287,7 +287,10 @@
               <textarea id="review-desc" rows="2" placeholder="Comparte los detalles de tu visita..." required></textarea>
             </div>
             
-            <button type="submit" class="btn btn-primary btn-sm" style="margin-top: 0.75rem;">Publicar Reseña</button>
+            <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
+              <button type="submit" id="submit-review-btn" class="btn btn-primary btn-sm">Publicar Reseña</button>
+              <button type="button" id="cancel-edit-review-btn" class="btn btn-secondary btn-sm hide">Cancelar</button>
+            </div>
           </form>
         </div>
       </div>
