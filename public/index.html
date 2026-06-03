@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuisaFood - Tu Bitácora Gastronómica</title>
+  <!-- Google Fonts: Outfit (modern sans-serif) & Playfair Display (classic editorial serif) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme">
+  <!-- Background Glows for Premium Aesthetic -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo-area">
+        <span class="logo-icon">🍔</span>
+        <h1 class="logo-title">Quisa<span>Food</span></h1>
+      </div>
+      <div class="header-actions">
+        <button id="theme-toggle" class="btn-icon" aria-label="Cambiar tema">
+          <svg class="sun-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <svg class="moon-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button id="add-btn-header" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>Registrar Restaurante</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-container">
+    <!-- Stats Dashboard Section -->
+    <section class="stats-section">
+      <div class="stats-grid">
+        <div class="stat-card card-glass animate-fade-in" style="--delay: 1;">
+          <div class="stat-icon">🏪</div>
+          <div class="stat-info">
+            <span class="stat-label">Restaurantes</span>
+            <span id="stat-total" class="stat-value">0</span>
+          </div>
+        </div>
+        <div class="stat-card card-glass animate-fade-in" style="--delay: 2;">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-info">
+            <span class="stat-label">Calificación Promedio</span>
+            <span id="stat-rating" class="stat-value">0.0</span>
+          </div>
+        </div>
+        <div class="stat-card card-glass animate-fade-in" style="--delay: 3;">
+          <div class="stat-icon">🍜</div>
+          <div class="stat-info">
+            <span class="stat-label">Cuisine Favorita</span>
+            <span id="stat-top-category" class="stat-value">-</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Toolbar Section (Filters & Search) -->
+    <section class="toolbar-section card-glass">
+      <div class="search-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="search-input" placeholder="Buscar por nombre, categoría o reseña..." aria-label="Buscar restaurantes">
+      </div>
+      <div class="filters-wrapper">
+        <div class="filter-group">
+          <label for="filter-category" class="sr-only">Categoría</label>
+          <select id="filter-category" aria-label="Filtrar por categoría">
+            <option value="all">Todas las categorías</option>
+            <!-- Dinámico -->
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="sort-select" class="sr-only">Ordenar por</label>
+          <select id="sort-select" aria-label="Ordenar por">
+            <option value="rating-desc">Mejor valorados</option>
+            <option value="rating-asc">Menor valorados</option>
+            <option value="date-desc">Más nuevos</option>
+            <option value="name-asc">Nombre (A - Z)</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Restaurant Grid -->
+    <section class="restaurants-section">
+      <div id="restaurants-grid" class="restaurants-grid">
+        <!-- Dinámico -->
+      </div>
+      
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state card-glass hide">
+        <div class="empty-icon">🍽️</div>
+        <h3>No se encontraron locales</h3>
+        <p>Prueba a cambiar tus filtros de búsqueda o agrega un nuevo restaurante para comenzar tu bitácora.</p>
+        <button id="add-btn-empty" class="btn btn-secondary">Registrar mi primer local</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal / Drawer Form (Add & Edit) -->
+  <div id="restaurant-modal" class="modal-overlay hide" aria-hidden="true">
+    <div class="modal-card card-glass animate-slide-up" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <header class="modal-header">
+        <h2 id="modal-title">Registrar Restaurante</h2>
+        <button id="close-modal-btn" class="btn-icon" aria-label="Cerrar modal">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </header>
+      <form id="restaurant-form" novalidate>
+        <input type="hidden" id="restaurant-id">
+        
+        <div class="form-grid">
+          <!-- Left side: Images upload and previews -->
+          <div class="form-col-left">
+            <label class="form-label">Foto Principal <span class="required">*</span></label>
+            <div id="image-dropzone" class="image-dropzone">
+              <input type="file" id="image-input" accept="image/*" class="sr-only">
+              <div id="dropzone-prompt" class="dropzone-prompt">
+                <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                <span>Foto de Portada</span>
+              </div>
+              <img id="image-preview" src="" alt="Previsualización principal" class="image-preview hide">
+              <button type="button" id="remove-image-btn" class="btn-remove-image hide" aria-label="Quitar portada">×</button>
+            </div>
+
+            <label class="form-label" style="margin-top: 1rem;">Fotos Adicionales (Galería)</label>
+            <div class="additional-images-uploader">
+              <button type="button" id="upload-additional-btn" class="btn btn-secondary btn-sm" style="width: 100%;">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Subir imágenes</span>
+              </button>
+              <input type="file" id="additional-images-input" accept="image/*" multiple class="sr-only">
+              <div id="additional-previews-container" class="additional-previews-container">
+                <!-- Miniaturas de imágenes adicionales -->
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right side: Fields -->
+          <div class="form-col-right">
+            <div class="form-group">
+              <label for="input-name" class="form-label">Nombre del Restaurante <span class="required">*</span></label>
+              <input type="text" id="input-name" placeholder="Ej. Bella Italia" required>
+              <span class="error-msg" id="error-name">El nombre es obligatorio.</span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="input-category" class="form-label">Categoría <span class="required">*</span></label>
+                <div class="category-input-wrapper">
+                  <select id="input-category" required>
+                    <option value="" disabled selected>Selecciona o escribe...</option>
+                    <option value="Italiana">Italiana</option>
+                    <option value="Asiática">Asiática</option>
+                    <option value="Mexicana">Mexicana</option>
+                    <option value="Comida Rápida">Comida Rápida</option>
+                    <option value="Cafetería / Bakery">Cafetería / Bakery</option>
+                    <option value="Carnes / Parrilla">Carnes / Parrilla</option>
+                    <option value="Mariscos">Mariscos</option>
+                    <option value="Vegetariana / Vegana">Vegetariana / Vegana</option>
+                    <option value="custom">+ Crear nueva...</option>
+                  </select>
+                  <input type="text" id="input-custom-category" class="hide" placeholder="Escribe la categoría...">
+                </div>
+                <span class="error-msg" id="error-category">Por favor selecciona o define una categoría.</span>
+              </div>
+            </div>
+
+            <!-- Initial Review Section (Only for new restaurants) -->
+            <div id="initial-review-section" class="initial-review-section">
+              <h3 class="section-subtitle">Tu Reseña Inicial</h3>
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="input-reviewer-name" class="form-label">Tu Nombre <span class="required">*</span></label>
+                  <input type="text" id="input-reviewer-name" placeholder="Ej. Dani" required>
+                  <span class="error-msg" id="error-reviewer-name">El nombre de reseñador es obligatorio.</span>
+                </div>
+                <div class="form-group">
+                  <label for="input-date" class="form-label">Fecha de Visita <span class="required">*</span></label>
+                  <input type="date" id="input-date" required>
+                  <span class="error-msg" id="error-date">La fecha es obligatoria.</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Calificación: <span id="rating-val-display" class="rating-val-badge">4.5</span></label>
+                <div class="rating-slider-wrapper">
+                  <input type="range" id="input-rating" min="1.0" max="5.0" step="0.1" value="4.5" class="rating-slider-input">
+                  <div class="stars-outer" style="font-size: 1.5rem;">
+                    <div class="stars-inner" id="form-stars-preview" style="width: 90%;"></div>
+                  </div>
+                </div>
+                <span class="error-msg" id="error-rating">Por favor califica el restaurante.</span>
+              </div>
+
+              <div class="form-group">
+                <label for="input-description" class="form-label">Experiencia <span class="required">*</span></label>
+                <textarea id="input-description" rows="3" placeholder="Escribe tu crítica culinaria..." required></textarea>
+                <span class="error-msg" id="error-description">La descripción es obligatoria.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <footer class="modal-footer">
+          <button type="button" id="cancel-modal-btn" class="btn btn-secondary">Cancelar</button>
+          <button type="submit" id="save-modal-btn" class="btn btn-primary">Guardar Registro</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- Detail / View Modal -->
+  <div id="detail-modal" class="modal-overlay hide" aria-hidden="true">
+    <div class="modal-card card-glass animate-slide-up detail-modal-card" role="dialog" aria-modal="true">
+      <div class="detail-hero">
+        <img id="detail-img" src="" alt="Restaurante">
+        <button id="close-detail-btn" class="btn-icon btn-close-detail" aria-label="Cerrar detalles">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <span id="detail-badge" class="category-badge">Categoría</span>
+        
+        <!-- Additional images overlay scroll -->
+        <div id="detail-thumbnails" class="detail-thumbnails">
+          <!-- Miniaturas dinámicas -->
+        </div>
+      </div>
+      
+      <div class="detail-body">
+        <div class="detail-meta">
+          <h2 id="detail-name">Nombre del Restaurante</h2>
+          <div class="detail-sub-meta">
+            <div class="avg-rating-wrapper">
+              <div class="stars-outer" style="font-size: 1.3rem;">
+                <div class="stars-inner" id="detail-stars-inner" style="width: 0%;"></div>
+              </div>
+              <span id="detail-rating-number" class="avg-rating-number">0.0</span>
+              <span id="detail-reviews-count" class="reviews-count">(0 reseñas)</span>
+            </div>
+          </div>
+        </div>
+        <hr class="detail-divider">
+        
+        <!-- Reviews Timeline Section -->
+        <div class="detail-reviews-section">
+          <h3>Opiniones y Críticas</h3>
+          <div id="detail-reviews-list" class="reviews-timeline">
+            <!-- Reseñas dinámicas -->
+          </div>
+        </div>
+
+        <hr class="detail-divider">
+
+        <!-- Add Review inline form -->
+        <div class="new-review-box card-glass">
+          <h4>Escribir una reseña</h4>
+          <form id="new-review-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="review-author" class="form-label">Nombre <span class="required">*</span></label>
+                <input type="text" id="review-author" placeholder="Tu nombre..." required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Fecha <span class="required">*</span></label>
+                <input type="date" id="review-date" required>
+              </div>
+            </div>
+            
+            <div class="form-group" style="margin-top: 0.5rem;">
+              <label class="form-label">Calificación: <span id="new-review-rating-val" class="rating-val-badge">4.0</span></label>
+              <div class="rating-slider-wrapper">
+                <input type="range" id="new-review-rating" min="1.0" max="5.0" step="0.1" value="4.0" class="rating-slider-input">
+                <div class="stars-outer" style="font-size: 1.3rem;">
+                  <div class="stars-inner" id="new-review-stars-preview" style="width: 80%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 0.5rem;">
+              <label for="review-desc" class="form-label">Comentarios <span class="required">*</span></label>
+              <textarea id="review-desc" rows="2" placeholder="Comparte los detalles de tu visita..." required></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-sm" style="margin-top: 0.75rem;">Publicar Reseña</button>
+          </form>
+        </div>
+      </div>
+      
+      <footer class="modal-footer detail-footer">
+        <button type="button" id="detail-edit-btn" class="btn btn-secondary">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          <span>Editar Local</span>
+        </button>
+        <button type="button" id="detail-delete-btn" class="btn btn-danger">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+          <span>Eliminar Local</span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Toast Notification System -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Footer -->
+  <footer class="app-footer-bar">
+    <p>&copy; 2026 QuisaFood - Tu guía gourmet personal y cooperativa</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
