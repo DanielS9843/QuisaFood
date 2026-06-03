@@ -16,7 +16,17 @@ let state = {
   uploadedAdditionalImages: [], // Array of base64 strings
   editingId: null,
   activeDetailId: null,
-  editingReviewId: null
+  editingReviewId: null,
+
+  // Homemade Dishes State
+  dishes: [],
+  activeTab: 'restaurants', // 'restaurants' or 'dishes'
+  dishFilters: {
+    search: '',
+    category: 'all'
+  },
+  editingDishId: null,
+  uploadedDishImageBase64: ''
 };
 
 // DOM Element Map
@@ -24,6 +34,12 @@ const DOM = {
   body: document.body,
   addBtnFab: document.getElementById('add-btn-fab'),
   addBtnEmpty: document.getElementById('add-btn-empty'),
+  
+  // Tabs Navigation
+  tabRestaurants: document.getElementById('tab-restaurants'),
+  tabDishes: document.getElementById('tab-dishes'),
+  restaurantsSectionView: document.getElementById('restaurants-section-view'),
+  dishesSectionView: document.getElementById('dishes-section-view'),
   
   // Stats
   statTotal: document.getElementById('stat-total'),
@@ -98,6 +114,35 @@ const DOM = {
   submitReviewBtn: document.getElementById('submit-review-btn'),
   cancelEditReviewBtn: document.getElementById('cancel-edit-review-btn'),
 
+  // Homemade Dishes UI Elements
+  dishStatMain: document.getElementById('dish-stat-main'),
+  dishStatDesserts: document.getElementById('dish-stat-desserts'),
+  dishStatLastDate: document.getElementById('dish-stat-last-date'),
+  dishSearchInput: document.getElementById('dish-search-input'),
+  dishFilterCategory: document.getElementById('dish-filter-category'),
+  dishesGrid: document.getElementById('dishes-grid'),
+  dishesEmptyState: document.getElementById('dishes-empty-state'),
+  addDishBtnEmpty: document.getElementById('add-dish-btn-empty'),
+  
+  dishModal: document.getElementById('dish-modal'),
+  dishModalTitle: document.getElementById('dish-modal-title'),
+  dishForm: document.getElementById('dish-form'),
+  closeDishModalBtn: document.getElementById('close-dish-modal-btn'),
+  cancelDishModalBtn: document.getElementById('cancel-dish-modal-btn'),
+  saveDishModalBtn: document.getElementById('save-dish-modal-btn'),
+  dishId: document.getElementById('dish-id'),
+  
+  dishImageDropzone: document.getElementById('dish-image-dropzone'),
+  dishImageInput: document.getElementById('dish-image-input'),
+  dishDropzonePrompt: document.getElementById('dish-dropzone-prompt'),
+  dishImagePreview: document.getElementById('dish-image-preview'),
+  dishRemoveImageBtn: document.getElementById('dish-remove-image-btn'),
+  
+  inputDishName: document.getElementById('input-dish-name'),
+  inputDishCategory: document.getElementById('input-dish-category'),
+  inputDishDate: document.getElementById('input-dish-date'),
+  inputDishDescription: document.getElementById('input-dish-description'),
+
   // Toasts
   toastContainer: document.getElementById('toast-container')
 };
@@ -108,6 +153,9 @@ const DOM = {
 async function init() {
   // Fetch Restaurants Database from Express Backend
   await fetchRestaurants();
+  
+  // Fetch Homemade Dishes from Express Backend
+  await fetchDishes();
 
   // Setup Event Listeners
   setupEventListeners();
@@ -125,6 +173,18 @@ async function fetchRestaurants() {
 
   updateCategoriesList();
   render();
+}
+
+async function fetchDishes() {
+  try {
+    const response = await fetch('/api/dishes');
+    if (!response.ok) throw new Error('API server error');
+    state.dishes = await response.json();
+  } catch (error) {
+    console.error('Error fetching dishes from backend:', error);
+    showToast('Error al conectar con los platos caseros', 'danger');
+  }
+  renderDishes();
 }
 
 function updateCategoriesList() {
@@ -1072,6 +1132,350 @@ function renderGrid() {
 }
 
 // ==========================================================================
+// Homemade Dishes Controller & UI Engine
+// ==========================================================================
+
+function switchTab(tabName) {
+  state.activeTab = tabName;
+  if (tabName === 'restaurants') {
+    DOM.tabRestaurants.classList.add('active');
+    DOM.tabDishes.classList.remove('active');
+    DOM.restaurantsSectionView.classList.remove('hide');
+    DOM.dishesSectionView.classList.add('hide');
+    DOM.addBtnFab.title = 'Registrar Restaurante';
+  } else {
+    DOM.tabRestaurants.classList.remove('active');
+    DOM.tabDishes.classList.add('active');
+    DOM.restaurantsSectionView.classList.add('hide');
+    DOM.dishesSectionView.classList.remove('hide');
+    DOM.addBtnFab.title = 'Registrar Plato Casero';
+  }
+}
+
+function handleFabClick() {
+  if (state.activeTab === 'restaurants') {
+    openAddModal();
+  } else {
+    openAddDishModal();
+  }
+}
+
+function openAddDishModal() {
+  state.editingDishId = null;
+  DOM.dishModalTitle.textContent = 'Registrar Plato Casero';
+  DOM.saveDishModalBtn.textContent = 'Registrar en el Álbum';
+  DOM.dishForm.reset();
+  clearDishCoverImage();
+  
+  DOM.inputDishDate.value = new Date().toISOString().split('T')[0];
+
+  const formGroups = DOM.dishForm.querySelectorAll('.form-group');
+  formGroups.forEach(group => group.classList.remove('invalid'));
+
+  DOM.dishModal.classList.remove('hide');
+  DOM.dishModal.setAttribute('aria-hidden', 'false');
+  DOM.body.style.overflow = 'hidden';
+}
+
+function openEditDishModal(dish) {
+  state.editingDishId = dish.id;
+  DOM.dishModalTitle.textContent = 'Editar Plato Casero';
+  DOM.saveDishModalBtn.textContent = 'Guardar Cambios';
+  
+  DOM.inputDishName.value = dish.name;
+  DOM.inputDishCategory.value = dish.category;
+  DOM.inputDishDate.value = dish.date;
+  DOM.inputDishDescription.value = dish.description;
+
+  if (dish.image) {
+    state.uploadedDishImageBase64 = dish.image;
+    DOM.dishImagePreview.src = dish.image;
+    DOM.dishImagePreview.classList.remove('hide');
+    DOM.dishDropzonePrompt.classList.add('hide');
+    DOM.dishRemoveImageBtn.classList.remove('hide');
+  } else {
+    clearDishCoverImage();
+  }
+
+  const formGroups = DOM.dishForm.querySelectorAll('.form-group');
+  formGroups.forEach(group => group.classList.remove('invalid'));
+
+  DOM.dishModal.classList.remove('hide');
+  DOM.dishModal.setAttribute('aria-hidden', 'false');
+  DOM.body.style.overflow = 'hidden';
+}
+
+function closeDishModal() {
+  DOM.dishModal.classList.add('hide');
+  DOM.dishModal.setAttribute('aria-hidden', 'true');
+  DOM.body.style.overflow = '';
+}
+
+function clearDishCoverImage() {
+  state.uploadedDishImageBase64 = '';
+  DOM.dishImageInput.value = '';
+  DOM.dishImagePreview.src = '';
+  DOM.dishImagePreview.classList.add('hide');
+  DOM.dishDropzonePrompt.classList.remove('hide');
+  DOM.dishRemoveImageBtn.classList.add('hide');
+}
+
+function setupDishImageUpload() {
+  DOM.dishImageDropzone.addEventListener('click', (e) => {
+    if (e.target === DOM.dishRemoveImageBtn || DOM.dishRemoveImageBtn.contains(e.target)) return;
+    DOM.dishImageInput.click();
+  });
+
+  DOM.dishImageInput.addEventListener('change', function() {
+    if (this.files && this.files[0]) {
+      handleDishCoverImage(this.files[0]);
+    }
+  });
+
+  DOM.dishImageDropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    DOM.dishImageDropzone.classList.add('dragover');
+  });
+
+  DOM.dishImageDropzone.addEventListener('dragleave', () => {
+    DOM.dishImageDropzone.classList.remove('dragover');
+  });
+
+  DOM.dishImageDropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    DOM.dishImageDropzone.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files && files[0]) {
+      handleDishCoverImage(files[0]);
+    }
+  });
+
+  DOM.dishRemoveImageBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    clearDishCoverImage();
+  });
+}
+
+function handleDishCoverImage(file) {
+  if (!file.type.startsWith('image/')) {
+    showToast('Archivo no válido. Debe ser una imagen.', 'danger');
+    return;
+  }
+  if (file.size > 3 * 1024 * 1024) {
+    showToast('La foto supera el límite de 3MB.', 'danger');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    state.uploadedDishImageBase64 = e.target.result;
+    DOM.dishImagePreview.src = e.target.result;
+    DOM.dishImagePreview.classList.remove('hide');
+    DOM.dishDropzonePrompt.classList.add('hide');
+    DOM.dishRemoveImageBtn.classList.remove('hide');
+  };
+  reader.readAsDataURL(file);
+}
+
+async function handleDishFormSubmit(e) {
+  e.preventDefault();
+
+  let isValid = true;
+
+  if (!DOM.inputDishName.value.trim()) {
+    DOM.inputDishName.parentElement.classList.add('invalid');
+    isValid = false;
+  } else {
+    DOM.inputDishName.parentElement.classList.remove('invalid');
+  }
+
+  if (!DOM.inputDishCategory.value) {
+    DOM.inputDishCategory.parentElement.classList.add('invalid');
+    isValid = false;
+  } else {
+    DOM.inputDishCategory.parentElement.classList.remove('invalid');
+  }
+
+  if (!DOM.inputDishDate.value) {
+    DOM.inputDishDate.parentElement.classList.add('invalid');
+    isValid = false;
+  } else {
+    DOM.inputDishDate.parentElement.classList.remove('invalid');
+  }
+
+  if (!DOM.inputDishDescription.value.trim()) {
+    DOM.inputDishDescription.parentElement.classList.add('invalid');
+    isValid = false;
+  } else {
+    DOM.inputDishDescription.parentElement.classList.remove('invalid');
+  }
+
+  if (!state.uploadedDishImageBase64) {
+    showToast('Por favor sube una foto de tu plato casero', 'danger');
+    return;
+  }
+
+  if (!isValid) {
+    showToast('Por favor completa todos los campos obligatorios', 'danger');
+    return;
+  }
+
+  let url = '/api/dishes';
+  let method = 'POST';
+  let bodyData = {
+    id: state.editingDishId || ('dish-' + Date.now()),
+    name: sanitizeHTML(DOM.inputDishName.value.trim()),
+    category: sanitizeHTML(DOM.inputDishCategory.value),
+    description: sanitizeHTML(DOM.inputDishDescription.value.trim()),
+    image: state.uploadedDishImageBase64,
+    date: DOM.inputDishDate.value
+  };
+
+  if (state.editingDishId) {
+    url = `/api/dishes/${state.editingDishId}`;
+    method = 'PUT';
+  }
+
+  try {
+    DOM.saveDishModalBtn.disabled = true;
+    DOM.saveDishModalBtn.textContent = 'Guardando...';
+
+    const response = await fetch(url, {
+      method: method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bodyData)
+    });
+
+    if (!response.ok) throw new Error('API server error');
+
+    showToast(state.editingDishId ? 'Plato actualizado con éxito' : '¡Plato registrado en su álbum!', 'success');
+    closeDishModal();
+    await fetchDishes();
+  } catch (error) {
+    console.error('Error saving dish:', error);
+    showToast('Error al conectar con el servidor', 'danger');
+  } finally {
+    DOM.saveDishModalBtn.disabled = false;
+  }
+}
+
+async function deleteDish(id) {
+  try {
+    const response = await fetch(`/api/dishes/${id}`, {
+      method: 'DELETE'
+    });
+
+    if (!response.ok) throw new Error('API server error');
+
+    showToast('Plato eliminado del álbum', 'danger');
+    await fetchDishes();
+  } catch (error) {
+    console.error('Error deleting dish:', error);
+    showToast('Error al eliminar el plato', 'danger');
+  }
+}
+
+function handleDishSearch(e) {
+  state.dishFilters.search = e.target.value.toLowerCase().trim();
+  renderDishesGrid();
+}
+
+function handleDishCategoryFilter(e) {
+  state.dishFilters.category = e.target.value;
+  renderDishesGrid();
+}
+
+function renderDishes() {
+  renderDishesStats();
+  renderDishesGrid();
+}
+
+function renderDishesStats() {
+  let mainCount = 0;
+  let dessertCount = 0;
+  let dates = [];
+
+  state.dishes.forEach(d => {
+    if (d.category === 'Plato Fuerte') mainCount++;
+    if (d.category === 'Postre') dessertCount++;
+    if (d.date) dates.push(d.date);
+  });
+
+  DOM.dishStatMain.textContent = mainCount;
+  DOM.dishStatDesserts.textContent = dessertCount;
+
+  if (dates.length > 0) {
+    dates.sort((a, b) => new Date(b) - new Date(a));
+    DOM.dishStatLastDate.textContent = formatDate(dates[0]);
+  } else {
+    DOM.dishStatLastDate.textContent = '-';
+  }
+}
+
+function renderDishesGrid() {
+  DOM.dishesGrid.innerHTML = '';
+
+  let filtered = state.dishes.filter(d => {
+    const matchesCategory = state.dishFilters.category === 'all' || d.category === state.dishFilters.category;
+    const matchesSearch = d.name.toLowerCase().includes(state.dishFilters.search) || 
+                          d.description.toLowerCase().includes(state.dishFilters.search);
+    return matchesCategory && matchesSearch;
+  });
+
+  if (filtered.length === 0) {
+    DOM.dishesGrid.classList.add('hide');
+    DOM.dishesEmptyState.classList.remove('hide');
+  } else {
+    DOM.dishesEmptyState.classList.add('hide');
+    DOM.dishesGrid.classList.remove('hide');
+
+    filtered.forEach((dish, index) => {
+      const card = document.createElement('article');
+      card.className = 'restaurant-card dish-card card-glass animate-fade-in';
+      card.style.setProperty('--delay', (index % 3) + 1);
+      card.dataset.id = dish.id;
+
+      card.innerHTML = `
+        <div class="card-img-wrapper">
+          <img src="${dish.image}" alt="${dish.name}" loading="lazy">
+          <span class="category-badge">${dish.category}</span>
+          <div class="dish-overlay">
+            <button class="btn-dish-action edit-dish-btn" title="Editar receta" aria-label="Editar plato">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            </button>
+            <button class="btn-dish-action delete-dish-action" title="Eliminar del álbum" aria-label="Eliminar plato">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <span class="card-date">Preparado el: ${formatDate(dish.date)}</span>
+          <h3 class="card-title">${dish.name}</h3>
+          <p class="card-description" style="-webkit-line-clamp: 4; font-weight: 400;">
+            ${dish.description}
+          </p>
+        </div>
+      `;
+
+      card.querySelector('.edit-dish-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        openEditDishModal(dish);
+      });
+
+      card.querySelector('.delete-dish-action').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (confirm(`¿Estás seguro de que deseas eliminar "${dish.name}" de su álbum casero?`)) {
+          deleteDish(dish.id);
+        }
+      });
+
+      DOM.dishesGrid.appendChild(card);
+    });
+  }
+}
+
+// ==========================================================================
 // Event Listeners Binding
 // ==========================================================================
 function setupEventListeners() {
@@ -1079,16 +1483,27 @@ function setupEventListeners() {
   DOM.filterCategory.addEventListener('change', handleCategoryFilter);
   DOM.sortSelect.addEventListener('change', handleSorting);
 
+  // Tab switching click bindings
+  DOM.tabRestaurants.addEventListener('click', () => switchTab('restaurants'));
+  DOM.tabDishes.addEventListener('click', () => switchTab('dishes'));
+
   if (DOM.addBtnFab) {
-    DOM.addBtnFab.addEventListener('click', openAddModal);
+    DOM.addBtnFab.addEventListener('click', handleFabClick);
   }
   DOM.addBtnEmpty.addEventListener('click', openAddModal);
+  DOM.addDishBtnEmpty.addEventListener('click', openAddDishModal);
   
   DOM.closeModalBtn.addEventListener('click', closeModal);
   DOM.cancelModalBtn.addEventListener('click', closeModal);
   DOM.restaurantForm.addEventListener('submit', handleFormSubmit);
 
-  // Sync range inputs with text displays and star percentages in real time
+  // Dish Modal Events
+  DOM.closeDishModalBtn.addEventListener('click', closeDishModal);
+  DOM.cancelDishModalBtn.addEventListener('click', closeDishModal);
+  DOM.dishForm.addEventListener('submit', handleDishFormSubmit);
+  DOM.dishSearchInput.addEventListener('input', handleDishSearch);
+  DOM.dishFilterCategory.addEventListener('change', handleDishCategoryFilter);
+
   DOM.inputRating.addEventListener('input', (e) => {
     syncFormSlider(e.target.value);
   });
@@ -1097,14 +1512,15 @@ function setupEventListeners() {
     syncReviewSlider(e.target.value);
   });
 
-  // Submit handler for adding a review in Detail modal
   DOM.newReviewForm.addEventListener('submit', handleAddReviewSubmit);
   DOM.cancelEditReviewBtn.addEventListener('click', cancelEditReview);
 
-  // Click outside modal
   window.addEventListener('click', (e) => {
     if (e.target === DOM.restaurantModal) {
       closeModal();
+    }
+    if (e.target === DOM.dishModal) {
+      closeDishModal();
     }
     if (e.target === DOM.detailModal) {
       closeDetailModal();
@@ -1114,6 +1530,7 @@ function setupEventListeners() {
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeModal();
+      closeDishModal();
       closeDetailModal();
     }
   });
@@ -1123,6 +1540,7 @@ function setupEventListeners() {
   DOM.detailDeleteBtn.addEventListener('click', handleDetailDelete);
 
   setupImageUpload();
+  setupDishImageUpload();
   setupCategoryTrigger();
 }
 

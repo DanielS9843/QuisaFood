@@ -28,7 +28,21 @@
     </div>
   </header>
 
+  <!-- Navigation Tabs -->
+  <nav class="app-nav">
+    <div class="nav-container">
+      <button id="tab-restaurants" class="nav-tab active">
+        <span>🍽️ Restaurantes</span>
+      </button>
+      <button id="tab-dishes" class="nav-tab">
+        <span>👨‍🍳 Nuestras Recetas</span>
+      </button>
+    </div>
+  </nav>
+
   <main class="app-container">
+    <!-- Restaurants View -->
+    <div id="restaurants-section-view">
     <!-- Stats Dashboard Section -->
     <section class="stats-section">
       <div class="stats-grid">
@@ -102,6 +116,77 @@
         <button id="add-btn-empty" class="btn btn-secondary">Registrar mi primer local</button>
       </div>
     </section>
+    </div>
+
+    <!-- Homemade Dishes View -->
+    <div id="dishes-section-view" class="hide">
+      <!-- Stats Dashboard Section -->
+      <section class="stats-section">
+        <div class="stats-grid">
+          <div class="stat-card card-glass animate-fade-in" style="--delay: 1;">
+            <div class="stat-icon">
+              <span class="stat-emoji" style="font-size: 1.75rem;">🍳</span>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Platos Fuertes</span>
+              <span id="dish-stat-main" class="stat-value">0</span>
+            </div>
+          </div>
+          <div class="stat-card card-glass animate-fade-in" style="--delay: 2;">
+            <div class="stat-icon">
+              <span class="stat-emoji" style="font-size: 1.75rem;">🍰</span>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Postres Hechos</span>
+              <span id="dish-stat-desserts" class="stat-value">0</span>
+            </div>
+          </div>
+          <div class="stat-card card-glass animate-fade-in" style="--delay: 3;">
+            <div class="stat-icon">
+              <span class="stat-emoji" style="font-size: 1.75rem;">📅</span>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Último Cocinado</span>
+              <span id="dish-stat-last-date" class="stat-value">-</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Toolbar Section (Filters & Search) -->
+      <section class="toolbar-section card-glass">
+        <div class="search-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="dish-search-input" placeholder="Buscar plato o descripción..." aria-label="Buscar platos caseros">
+        </div>
+        <div class="filters-wrapper">
+          <div class="filter-group">
+            <label for="dish-filter-category" class="sr-only">Categoría</label>
+            <select id="dish-filter-category" aria-label="Filtrar por categoría">
+              <option value="all">Todas las categorías</option>
+              <option value="Plato Fuerte">Platos Fuertes</option>
+              <option value="Postre">Postres</option>
+              <option value="Otro">Otros</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dishes Grid -->
+      <section class="restaurants-section">
+        <div id="dishes-grid" class="restaurants-grid">
+          <!-- Dinámico -->
+        </div>
+        
+        <!-- Empty State -->
+        <div id="dishes-empty-state" class="empty-state card-glass hide">
+          <div class="empty-icon">🍳</div>
+          <h3>¿Qué cocinaremos hoy?</h3>
+          <p>Aún no han registrado platos en su álbum. ¡Agrega su primera creación culinaria!</p>
+          <button id="add-dish-btn-empty" class="btn btn-secondary">Registrar nuestro primer plato</button>
+        </div>
+      </section>
+    </div>
   </main>
 
   <!-- Modal / Drawer Form (Add & Edit) -->
@@ -213,6 +298,75 @@
         <footer class="modal-footer">
           <button type="button" id="cancel-modal-btn" class="btn btn-secondary">Cancelar</button>
           <button type="submit" id="save-modal-btn" class="btn btn-primary">Guardar Registro</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal / Drawer Form (Add & Edit Dish) -->
+  <div id="dish-modal" class="modal-overlay hide" aria-hidden="true">
+    <div class="modal-card card-glass animate-slide-up" role="dialog" aria-modal="true" aria-labelledby="dish-modal-title">
+      <header class="modal-header">
+        <h2 id="dish-modal-title">Registrar Plato Casero</h2>
+        <button id="close-dish-modal-btn" class="btn-icon" aria-label="Cerrar modal">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </header>
+      <form id="dish-form" novalidate>
+        <input type="hidden" id="dish-id">
+        
+        <div class="form-grid">
+          <!-- Left side: Images upload and previews -->
+          <div class="form-col-left">
+            <label class="form-label">Foto del Plato <span class="required">*</span></label>
+            <div id="dish-image-dropzone" class="image-dropzone">
+              <input type="file" id="dish-image-input" accept="image/*" class="sr-only">
+              <div id="dish-dropzone-prompt" class="dropzone-prompt">
+                <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                <span>Foto de nuestra creación</span>
+              </div>
+              <img id="dish-image-preview" src="" alt="Previsualización del plato" class="image-preview hide">
+              <button type="button" id="dish-remove-image-btn" class="btn-remove-image hide" aria-label="Quitar foto">×</button>
+            </div>
+          </div>
+          
+          <!-- Right side: Fields -->
+          <div class="form-col-right">
+            <div class="form-group">
+              <label for="input-dish-name" class="form-label">Nombre del Plato <span class="required">*</span></label>
+              <input type="text" id="input-dish-name" placeholder="Ej. Lasaña Boloñesa Casera" required>
+              <span class="error-msg" id="error-dish-name">El nombre del plato es obligatorio.</span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="input-dish-category" class="form-label">Categoría <span class="required">*</span></label>
+                <select id="input-dish-category" required>
+                  <option value="" disabled selected>Selecciona...</option>
+                  <option value="Plato Fuerte">Plato Fuerte</option>
+                  <option value="Postre">Postre</option>
+                  <option value="Otro">Otro</option>
+                </select>
+                <span class="error-msg" id="error-dish-category">Por favor selecciona una categoría.</span>
+              </div>
+              <div class="form-group">
+                <label for="input-dish-date" class="form-label">Fecha de Preparación <span class="required">*</span></label>
+                <input type="date" id="input-dish-date" required>
+                <span class="error-msg" id="error-dish-date">La fecha es obligatoria.</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="input-dish-description" class="form-label">Descripción / Experiencia <span class="required">*</span></label>
+              <textarea id="input-dish-description" rows="5" placeholder="¿Cómo lo cocinaron? ¿Qué tal les quedó? Comparte la anécdota culinaria..." required></textarea>
+              <span class="error-msg" id="error-dish-description">La descripción es obligatoria.</span>
+            </div>
+          </div>
+        </div>
+
+        <footer class="modal-footer">
+          <button type="button" id="cancel-dish-modal-btn" class="btn btn-secondary">Cancelar</button>
+          <button type="submit" id="save-dish-modal-btn" class="btn btn-primary">Registrar en el Álbum</button>
         </footer>
       </form>
     </div>

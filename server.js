@@ -105,6 +105,35 @@ const AdditionalImage = sequelize.define('AdditionalImage', {
   timestamps: false
 });
 
+const Dish = sequelize.define('Dish', {
+  id: {
+    type: DataTypes.STRING,
+    primaryKey: true
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  category: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  image: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  date: {
+    type: DataTypes.STRING,
+    allowNull: false
+  }
+}, {
+  timestamps: true
+});
+
 // Setup Relationships (CASCADE ensures that deleting a restaurant deletes its reviews & gallery images)
 Restaurant.hasMany(Review, { as: 'reviews', foreignKey: 'restaurantId', onDelete: 'CASCADE' });
 Review.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
@@ -355,6 +384,97 @@ app.delete('/api/restaurants/:id', async (req, res) => {
   }
 });
 
+// ==========================================================================
+// Homemade Dishes API Routes
+// ==========================================================================
+
+// 7. GET all dishes
+app.get('/api/dishes', async (req, res) => {
+  try {
+    const list = await Dish.findAll({
+      order: [
+        ['date', 'DESC'],
+        ['createdAt', 'DESC']
+      ]
+    });
+    res.json(list);
+  } catch (error) {
+    console.error('Error fetching dishes:', error);
+    res.status(500).json({ error: 'Error al obtener los platos caseros.' });
+  }
+});
+
+// 8. POST create a new dish
+app.post('/api/dishes', async (req, res) => {
+  try {
+    const { id, name, category, description, image, date } = req.body;
+
+    if (!id || !name || !category || !description || !image || !date) {
+      return res.status(400).json({ error: 'Faltan campos obligatorios para registrar el plato.' });
+    }
+
+    const newDish = await Dish.create({
+      id,
+      name,
+      category,
+      description,
+      image,
+      date
+    });
+
+    res.status(201).json(newDish);
+  } catch (error) {
+    console.error('Error creating dish:', error);
+    res.status(500).json({ error: 'Error al registrar el plato en la base de datos.' });
+  }
+});
+
+// 9. PUT edit a dish
+app.put('/api/dishes/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, category, description, image, date } = req.body;
+
+    const dish = await Dish.findByPk(id);
+    if (!dish) {
+      return res.status(404).json({ error: 'Plato no encontrado.' });
+    }
+
+    await dish.update({
+      name,
+      category,
+      description,
+      image,
+      date
+    });
+
+    res.json(dish);
+  } catch (error) {
+    console.error('Error updating dish:', error);
+    res.status(500).json({ error: 'Error al actualizar el plato.' });
+  }
+});
+
+// 10. DELETE a dish
+app.delete('/api/dishes/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const affectedRows = await Dish.destroy({
+      where: { id }
+    });
+
+    if (affectedRows === 0) {
+      return res.status(404).json({ error: 'Plato no encontrado.' });
+    }
+
+    res.json({ success: true, message: 'Plato eliminado de la base de datos.' });
+  } catch (error) {
+    console.error('Error deleting dish:', error);
+    res.status(500).json({ error: 'Error al eliminar el plato.' });
+  }
+});
+
 // Fallback to SPA index.html for undefined routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -489,6 +609,35 @@ sequelize.sync({ alter: true }) // Syncs columns cleanly without wiping unless i
         }
       }
       console.log('Seeding completed successfully.');
+    }
+
+    // Seed initial mock dishes if empty
+    const dishCount = await Dish.count();
+    if (dishCount === 0) {
+      console.log('Seeding database with default mock dishes...');
+      const defaultDishes = [
+        {
+          id: 'dish-mock-1',
+          name: 'Pasta Alfredo con Pollo y Champiñones',
+          category: 'Plato Fuerte',
+          description: 'Nuestra primera pasta hecha en casa desde cero. Cocinamos la salsa Alfredo juntos con mucha crema de leche, parmesano y ajo, y salteamos los champiñones en mantequilla. ¡Nos quedó deliciosa y súper cremosa!',
+          image: 'https://images.unsplash.com/photo-1645112411341-6c4fd023714a?w=600&auto=format&fit=crop&q=80',
+          date: '2026-05-10'
+        },
+        {
+          id: 'dish-mock-2',
+          name: 'Brownie con Helado de Vainilla',
+          category: 'Postre',
+          description: 'Para celebrar nuestro aniversario mensual, horneamos unos brownies súper melcochudos de chocolate oscuro. Los servimos calientes con una bola de helado de vainilla y fresas encima. Un postre perfecto lleno de amor.',
+          image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=600&auto=format&fit=crop&q=80',
+          date: '2026-05-24'
+        }
+      ];
+
+      for (const item of defaultDishes) {
+        await Dish.create(item);
+      }
+      console.log('Dish seeding completed successfully.');
     }
 
     app.listen(PORT, () => {
